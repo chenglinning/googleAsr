@@ -1,9 +1,10 @@
 import json
 import time
+import wave
+import contextlib
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 from urllib.error import URLError, HTTPError
-
 
 class UnknownValueError(Exception): pass
 class RequestError(Exception): pass
@@ -41,8 +42,10 @@ def recognize_google(audio_data, rate=16000, key=None, language="en-US", show_al
             break
 
     # return results
-    if show_all: return actual_result
-    if "alternative" not in actual_result: raise UnknownValueError()
+    if show_all:
+        return actual_result
+    if "alternative" not in actual_result:
+        raise UnknownValueError()
     for entry in actual_result["alternative"]:
         if "transcript" in entry:
             return entry["transcript"]
@@ -50,10 +53,14 @@ def recognize_google(audio_data, rate=16000, key=None, language="en-US", show_al
 
 
 if __name__ == '__main__':
-    with open("data/Kikago_20190216_154159_NC.wav", 'rb') as speech:
-        speech_content = speech.read()
+    with contextlib.closing(wave.open("data/Kikago_20190216_154159_NC.wav", 'rb')) as f:
+        binary_data = f.readframes(f.getnframes())
+        frames = f.getnframes()
+        frate = f.getframerate()
+        duration = frames / float(frate)
+        print(duration)
 
     start = time.time()
-    recognize_google(speech_content)
+    recognize_google(binary_data)
     end = time.time()
     print('response time: {}'.format(end - start))
