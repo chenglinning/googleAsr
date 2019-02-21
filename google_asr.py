@@ -63,4 +63,18 @@ if __name__ == '__main__':
     start = time.time()
     recognize_google(binary_data)
     end = time.time()
+
     print('response time: {}'.format(end - start))
+
+    # with contextlib.closing(wave.open("data/hello.wav", 'rb')) as f:
+    #     binary_data = f.readframes(f.getnframes())
+    #     frames = f.getnframes()
+    #     frate = f.getframerate()
+    #     duration = frames / float(frate)
+    #     print(duration)
+    #
+    # start = time.time()
+    # recognize_google(binary_data)
+    # end = time.time()
+    #
+    # print('response time: {}'.format(end - start))
