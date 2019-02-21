@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="69acfb3d-5ad8-4373-b821-93586b27ada4" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/data/hello.wav" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/google_asr.py" beforeDir="false" afterPath="$PROJECT_DIR$/google_asr.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -15,8 +16,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/google_asr.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="157">
-              <caret line="31" column="4" selection-start-line="31" selection-start-column="4" selection-end-line="31" selection-end-column="4" />
+            <state relative-caret-position="180">
+              <caret line="55" column="69" selection-start-line="55" selection-start-column="69" selection-end-line="55" selection-end-column="69" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -150,8 +151,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/google_asr.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="157">
-          <caret line="31" column="4" selection-start-line="31" selection-start-column="4" selection-end-line="31" selection-end-column="4" />
+        <state relative-caret-position="180">
+          <caret line="55" column="69" selection-start-line="55" selection-start-column="69" selection-end-line="55" selection-end-column="69" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>

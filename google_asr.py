@@ -53,7 +53,7 @@ def recognize_google(audio_data, rate=16000, key=None, language="en-US", show_al
 
 
 if __name__ == '__main__':
-    with contextlib.closing(wave.open("data/Kikago_20190216_154159_NC.wav", 'rb')) as f:
+    with contextlib.closing(wave.open("data/Kikago_20190218_130443_NC.wav", 'rb')) as f:
         binary_data = f.readframes(f.getnframes())
         frames = f.getnframes()
         frate = f.getframerate()
