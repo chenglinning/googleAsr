@@ -4,11 +4,13 @@
 
 import asyncio
 import websockets
+import datetime
 import logging
 import json
 import base64
 #from utils.log_utils import setup_logging
 from google_asr_base64 import recognize_google
+from google_asr_base64 import UnknownValueError
 import time
 
 """
@@ -34,10 +36,16 @@ async def ws_server(ws, path):
             out = data
             start = time.time()
             wav = base64.b64decode(data['data']['audio'])
+            with open(f"output/{datetime.datetime.now():%Y-%m-%dT%H%M%S}.wav", mode='bx') as f:
+                f.write(wav)
             # frames = wav.getnframes()
             # frate = wav.getframerate()
             # print("duration: {}".format(frames / float(frate)))
-            out['data']['result'] = recognize_google(wav)
+            try:
+                out['data']['result'] = recognize_google(wav)
+            except UnknownValueError:
+                out['data']['result'] = 'Unknown'
+
             stop = time.time()
             out['data']['response_time'] = round(stop - start, 5)
             del out['data']['audio']
