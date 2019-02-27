@@ -1,11 +1,13 @@
 import json
 import time
 import wave
+import base64
 import contextlib
 
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 from urllib.error import URLError, HTTPError
+
 
 class UnknownValueError(Exception): pass
 class RequestError(Exception): pass
@@ -30,6 +32,7 @@ def recognize_google(audio_data, rate=16000, key=None, language="en-US", show_al
     except URLError as e:
         raise RequestError("recognition connection failed: {0}".format(e.reason))
     response_text = response.read().decode("utf-8")
+    print(response_text)
 
     # ignore any blank blocks
     actual_result = []
@@ -53,15 +56,19 @@ def recognize_google(audio_data, rate=16000, key=None, language="en-US", show_al
 
 
 # if __name__ == '__main__':
-#     with contextlib.closing(wave.open("data/test_rearthree.wav", 'rb')) as f:
-#         binary_data = f.readframes(f.getnframes())
-#         frames = f.getnframes()
-#         frate = f.getframerate()
-#         duration = frames / float(frate)
-#         print(duration)
+#     # with contextlib.closing(wave.open("data/test_rearthree.wav", 'rb')) as f:
+#     #     binary_data = f.readframes(f.getnframes())
+#     #     frames = f.getnframes()
+#     #     frate = f.getframerate()
+#     #     duration = frames / float(frate)
+#     #     print(duration)
 #
-#     start = time.time()
-#     recognize_google(binary_data)
-#     end = time.time()
+#     with open("data/test.wav", "rb") as speech:
+#         speech_content = base64.b64encode(speech.read())
 #
-#     print('response time: {}'.format(end - start))
+#     print(speech_content)
+#     # start = time.time()
+#     recognize_google(base64.b64decode(speech_content))
+#     # end = time.time()
+#     #
+#     # print('response time: {}'.format(end - start))
