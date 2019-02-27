@@ -29,6 +29,7 @@ async def ws_server(ws, path):
     while True:
         try:
             in_data = await ws.recv()
+            print(in_data) 
             data = json.loads(in_data)
             out = data
             start = time.time()
@@ -51,7 +52,7 @@ async def ws_server(ws, path):
             print(connected)
             break
             
-start_server = websockets.serve(ws_server, 'localhost', 8765)
+start_server = websockets.serve(ws_server, 'localhost', 3456)
 print('Start listening:')
 
 asyncio.get_event_loop().run_until_complete(start_server)
