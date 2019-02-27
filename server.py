@@ -34,21 +34,20 @@ async def ws_server(ws, path):
             print(in_data) 
             data = json.loads(in_data)
             out = data
-            start = time.time()
-            wav = base64.b64decode(data['data']['audio'])
+#            start = time.time()
+#            wav = base64.b64decode(data['data']['audio'])
+            chunk = ''.join(['data']['audio'])
             with open(f"output/{datetime.datetime.now():%Y-%m-%dT%H%M%S}.wav", mode='bx') as f:
-                f.write(wav)
-            # frames = wav.getnframes()
-            # frate = wav.getframerate()
-            # print("duration: {}".format(frames / float(frate)))
-            try:
-                out['data']['result'] = recognize_google(wav)
-            except UnknownValueError:
-                out['data']['result'] = 'Unknown'
+                f.write(chunk)
 
-            stop = time.time()
-            out['data']['response_time'] = round(stop - start, 5)
-            del out['data']['audio']
+            # try:
+            #     out['data']['result'] = recognize_google(wav)
+            # except UnknownValueError:
+            #     out['data']['result'] = 'Unknown'
+
+#            stop = time.time()
+#            out['data']['response_time'] = round(stop - start, 5)
+#            del out['data']['audio']
             await ws.send(json.dumps(out))
         
         except websockets.exceptions.ConnectionClosed:
