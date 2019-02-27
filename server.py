@@ -37,11 +37,11 @@ async def ws_server(ws, path):
 #            start = time.time()
 #            wav = base64.b64decode(data['data']['audio'])
             try:
-                chunk = ''.join(['data']['audio'])
+                chunk = ''.join(data['data']['audio'])
             except KeyError:
                 pass
             with open(f"output/{datetime.datetime.now():%Y-%m-%dT%H%M%S}.wav", mode='bx') as f:
-                f.write(chunk)
+                f.write(base64.b64decode(chunk))
 
             # try:
             #     out['data']['result'] = recognize_google(wav)
