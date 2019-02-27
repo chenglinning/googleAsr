@@ -36,7 +36,10 @@ async def ws_server(ws, path):
             out = data
 #            start = time.time()
 #            wav = base64.b64decode(data['data']['audio'])
-            chunk = ''.join(['data']['audio'])
+            try:
+                chunk = ''.join(['data']['audio'])
+            except KeyError:
+                pass
             with open(f"output/{datetime.datetime.now():%Y-%m-%dT%H%M%S}.wav", mode='bx') as f:
                 f.write(chunk)
 
