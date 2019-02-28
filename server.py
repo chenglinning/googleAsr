@@ -28,8 +28,7 @@ async def ws_server(ws, path):
     print('current: ')
     print(connected)
 
-    with wave.open(f"output/{datetime.datetime.now():%Y-%m-%dT%H%M%S}.wav", mode='wb') as f:
-        f.setparams((1, 2, 16000, 0, 'NONE', 'NONE'))
+    with open(f"output/{datetime.datetime.now():%Y-%m-%dT%H%M%S}.pcm", mode='bx') as f:
         while True:
             try:
                 in_data = await ws.recv()
@@ -40,9 +39,10 @@ async def ws_server(ws, path):
 
                 if 'audio' in data['data']:
                     chunk = ''.join(data['data']['audio'])
+                    #print(chunk)
                 else:
                     chunk = ''
-                f.writeframesraw(base64.b64decode(chunk))
+                f.write(base64.b64decode(chunk))
 
                 # try:
                 #     out['data']['result'] = recognize_google(wav)
