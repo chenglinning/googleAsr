@@ -5,7 +5,7 @@
 import asyncio
 import websockets
 import datetime
-import logging
+import wave
 import json
 import base64
 #from utils.log_utils import setup_logging
@@ -28,7 +28,8 @@ async def ws_server(ws, path):
     print('current: ')
     print(connected)
 
-    with open(f"output/{datetime.datetime.now():%Y-%m-%dT%H%M%S}.wav", mode='bx') as f:
+    with wave.open(f"output/{datetime.datetime.now():%Y-%m-%dT%H%M%S}.wav", mode='wb') as f:
+        f.setparams((1, 2, 16000, 0, 'NONE', 'NONE'))
         while True:
             try:
                 in_data = await ws.recv()
@@ -39,10 +40,9 @@ async def ws_server(ws, path):
 
                 if 'audio' in data['data']:
                     chunk = ''.join(data['data']['audio'])
-                    #print(chunk)
                 else:
                     chunk = ''
-                f.write(base64.b64decode(chunk))
+                f.writeframesraw(base64.b64decode(chunk))
 
                 # try:
                 #     out['data']['result'] = recognize_google(wav)

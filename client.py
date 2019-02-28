@@ -16,7 +16,6 @@ quest = {
 }
 
 
-
 async def hello():
     async with websockets.connect(
             'ws://localhost:3456') as websocket:
