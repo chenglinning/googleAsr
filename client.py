@@ -9,7 +9,7 @@ import time
 import base64
 
 quest = {
-            'header': [1111, 0, 1000, int(time.time()), 3, 0],
+            'header': [1111, 0, 1000, int(time.time()), 3, 0, 1],
             'data': {
                 'audio': None
             }
@@ -31,6 +31,8 @@ async def hello():
             quest['data']['audio'] = base64.b64encode(chunk).decode('utf-8')
             await websocket.send(json.dumps(quest))
 
+        quest['header'][6] = 0
+        await websocket.send(json.dumps(quest))
         greeting = await websocket.recv()
         stop = time.time()
         print(f"< {greeting}")

@@ -1,3 +1,4 @@
+import io
 
 
 def transcribe_streaming(stream_file):
@@ -12,6 +13,9 @@ def transcribe_streaming(stream_file):
 
     # In practice, stream should be a generator yielding chunks of audio data.
     stream = [content]
+    for chunk in stream:
+        print('hello: ')
+        print(chunk)
     requests = (types.StreamingRecognizeRequest(audio_content=chunk)
                 for chunk in stream)
 
@@ -36,3 +40,8 @@ def transcribe_streaming(stream_file):
             for alternative in alternatives:
                 print('Confidence: {}'.format(alternative.confidence))
                 print(u'Transcript: {}'.format(alternative.transcript))
+
+
+
+if __name__ == '__main__':
+    transcribe_streaming('/Users/xiajimu/Documents/test/googleAsr/test.wav')
