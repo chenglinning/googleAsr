@@ -39,8 +39,8 @@ async def ws_server(ws, path):
             if 'audio' in data['data']:
                 chunk = ''.join(data['data']['audio'])
 
-            with open(f"output/{datetime.datetime.now():%Y-%m-%dT%H%M%S}.wav", mode='bx') as f:
-                f.write(base64.b64decode(chunk))
+                with open(f"output/{datetime.datetime.now():%Y-%m-%dT%H%M%S}.wav", mode='bx') as f:
+                    f.write(base64.b64decode(chunk))
 
             # try:
             #     out['data']['result'] = recognize_google(wav)
