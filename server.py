@@ -65,7 +65,10 @@ async def ws_server(ws, path):
                 stream.append(base64.b64decode(d['data']['audio']))
             else:
                 pass
-            
+
+            if len(d['header']) == 6:
+                break
+                
             if d['header'][6] == 0:
                 client = speech.SpeechClient()
                 print(stream)
