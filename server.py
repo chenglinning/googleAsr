@@ -40,6 +40,8 @@ async def ws_server(ws, path):
                 if 'audio' in data['data']:
                     chunk = ''.join(data['data']['audio'])
                     #print(chunk)
+                else:
+                    chunk = ''
                 f.write(base64.b64decode(chunk))
 
                 # try:
