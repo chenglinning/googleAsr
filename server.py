@@ -28,38 +28,38 @@ async def ws_server(ws, path):
     print('current: ')
     print(connected)
 
-    while True:
-        try:
-            in_data = await ws.recv()
-            print(in_data) 
-            data = json.loads(in_data)
-            out = data
-#            start = time.time()
-#            wav = base64.b64decode(data['data']['audio'])
-            if 'audio' in data['data']:
-                chunk = ''.join(data['data']['audio'])
+    with open(f"output/{datetime.datetime.now():%Y-%m-%dT%H%M%S}.wav", mode='bx') as f:
+        while True:
+            try:
+                in_data = await ws.recv()
+                print(in_data)
+                data = json.loads(in_data)
+    #            start = time.time()
+    #            wav = base64.b64decode(data['data']['audio'])
 
-                with open(f"output/{datetime.datetime.now():%Y-%m-%dT%H%M%S}.wav", mode='bx') as f:
-                    f.write(base64.b64decode(chunk))
+                if 'audio' in data['data']:
+                    chunk = ''.join(data['data']['audio'])
+                    #print(chunk)
+                f.write(base64.b64decode(chunk))
 
-            # try:
-            #     out['data']['result'] = recognize_google(wav)
-            # except UnknownValueError:
-            #     out['data']['result'] = 'Unknown'
+                # try:
+                #     out['data']['result'] = recognize_google(wav)
+                # except UnknownValueError:
+                #     out['data']['result'] = 'Unknown'
 
-#            stop = time.time()
-#            out['data']['response_time'] = round(stop - start, 5)
-#            del out['data']['audio']
-            await ws.send(json.dumps(out))
-        
-        except websockets.exceptions.ConnectionClosed:
-            '''
-            TODO: Logging.info
-            '''
-            print('{}: user disconnected'.format(int(time.time())))
-            connected.remove(ws)
-            print(connected)
-            break
+    #            stop = time.time()
+    #            out['data']['response_time'] = round(stop - start, 5)
+    #            del out['data']['audio']
+                await ws.send("Done")
+
+            except websockets.exceptions.ConnectionClosed:
+                '''
+                TODO: Logging.info
+                '''
+                print('{}: user disconnected'.format(int(time.time())))
+                connected.remove(ws)
+                print(connected)
+                break
             
 start_server = websockets.serve(ws_server, 'localhost', 3456)
 print('Start listening:')

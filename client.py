@@ -16,14 +16,21 @@ quest = {
 }
 
 
+
 async def hello():
     async with websockets.connect(
             'ws://localhost:3456') as websocket:
 
         start = time.time()
-        with open("data/test_message.wav", "rb") as speech:
-            quest['data']['audio'] = base64.b64encode(speech.read()).decode('utf-8')
-        await websocket.send(json.dumps(quest))
+        with open("data/test.wav", "rb") as speech:
+            content = speech.read()
+
+        n = 512
+        stream = [content[i:i + n] for i in range(0, len(content), n)]
+
+        for chunk in stream:
+            quest['data']['audio'] = base64.b64encode(chunk).decode('utf-8')
+            await websocket.send(json.dumps(quest))
 
         greeting = await websocket.recv()
         stop = time.time()
