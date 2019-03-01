@@ -37,13 +37,13 @@ def print_response(r):
         # is_final result. The other results will be for subsequent portions of
         # the audio.
         for result in response.results:
-            print('Finished: {}'.format(result.is_final))
-            print('Stability: {}'.format(result.stability))
+            #print('Finished: {}'.format(result.is_final))
+            #print('Stability: {}'.format(result.stability))
             alternatives = result.alternatives
             # The alternatives are ordered from most likely to least.
             for alternative in alternatives:
-                print('Confidence: {}'.format(alternative.confidence))
-                print(u'Transcript: {}'.format(alternative.transcript))
+                #print('Confidence: {}'.format(alternative.confidence))
+                #print(u'Transcript: {}'.format(alternative.transcript))
                 return alternative.transcript
 
 
@@ -54,7 +54,6 @@ async def ws_server(ws, path):
     print(connected)
 
     stream = []
-    transcript = 'Empty'
 
     while True:
         try:
@@ -67,6 +66,7 @@ async def ws_server(ws, path):
                 pass
                 
             if d['header'][6] == 0:
+                start = time.time()
                 out = d
                 client = speech.SpeechClient()
 
@@ -82,7 +82,7 @@ async def ws_server(ws, path):
                 responses = client.streaming_recognize(streaming_config, requests)
 
                 res = print_response(responses)
-
+                stop = time.time()
 #                with open(f"output/{datetime.datetime.now():%Y-%m-%dT%H%M%S}.pcm", mode='bx') as f:
                 with open(f"output/{datetime.datetime.now():%Y-%m-%dT%H%M%S}_{res}.pcm", mode='bx') as f:
                     for chunk in stream:
@@ -93,8 +93,9 @@ async def ws_server(ws, path):
                 out['data']['result'] = res
 
     #            stop = time.time()
-    #            out['data']['response_time'] = round(stop - start, 5)
+                out['data']['response_time'] = round(stop - start, 5)
                 del out['data']['audio']
+                print(json.dumps(out))
                 await ws.send(json.dumps(out))
 
         except websockets.exceptions.ConnectionClosed:
