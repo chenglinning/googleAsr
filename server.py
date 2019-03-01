@@ -65,10 +65,12 @@ async def ws_server(ws, path):
                 pass
                 
             if d['header'][6] == 0:
+                out = d
                 client = speech.SpeechClient()
 
                 requests = (types.StreamingRecognizeRequest(audio_content=chunk)
                             for chunk in stream)
+
                 config = types.RecognitionConfig(
                     encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16,
                     sample_rate_hertz=16000,
@@ -77,22 +79,27 @@ async def ws_server(ws, path):
                 streaming_config = types.StreamingRecognitionConfig(config=config)
                 responses = client.streaming_recognize(streaming_config, requests)
 
-                print_response(responses)
-                with open(f"output/{datetime.datetime.now():%Y-%m-%dT%H%M%S}.pcm", mode='bx') as f:
+                for response in responses:
+                    for result in response.results:
+                        alternatives = result.alternatives
+                        for alternative in alternatives:
+                            print('Confidence: {}'.format(alternative.confidence))
+                            print(u'Transcript: {}'.format(alternative.transcript))
+                            transcript = alternative.transcript
+
+#                with open(f"output/{datetime.datetime.now():%Y-%m-%dT%H%M%S}.pcm", mode='bx') as f:
+                with open(f"output/{datetime.datetime.now():%Y-%m-%dT%H%M%S}_{transcript}.pcm", mode='bx') as f:
                     for chunk in stream:
                         f.write(chunk)
 
                 stream = []
-            #f.write(base64.b64decode(d['data']['audio']))
-            # try:
-            #     out['data']['result'] = recognize_google(wav)
-            # excecpt UnknownValueError:
-            #     out['data']['result'] = 'Unknown'
+
+                out['data']['result'] = alternative.transcript
 
     #            stop = time.time()
     #            out['data']['response_time'] = round(stop - start, 5)
-    #            del out['data']['audio']
-            await ws.send("Done")
+                del out['data']['audio']
+                await ws.send(json.dumps(out))
 
         except websockets.exceptions.ConnectionClosed:
             '''
