@@ -53,8 +53,9 @@ async def ws_server(ws, path):
     print(connected)
 
     stream = []
+    alternative = []
     transcript = 'Empty'
-    
+
     while True:
         try:
             in_data = await ws.recv()
