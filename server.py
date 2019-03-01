@@ -53,25 +53,20 @@ async def ws_server(ws, path):
     print(connected)
 
     stream = []
-#    with open(f"output/{datetime.datetime.now():%Y-%m-%dT%H%M%S}.pcm", mode='bx') as f:
+
     while True:
         try:
             in_data = await ws.recv()
             d = json.loads(in_data)
-            #with io.open('/Users/xiajimu/Documents/test/googleAsr/test.wav', 'rb') as audio_file:
-                #content = audio_file.read()
 
             if 'audio' in d['data']:
                 stream.append(base64.b64decode(d['data']['audio']))
             else:
                 pass
-
-            if len(d['header']) == 6:
-                break
                 
             if d['header'][6] == 0:
                 client = speech.SpeechClient()
-                print(stream)
+
                 requests = (types.StreamingRecognizeRequest(audio_content=chunk)
                             for chunk in stream)
                 config = types.RecognitionConfig(
@@ -83,6 +78,10 @@ async def ws_server(ws, path):
                 responses = client.streaming_recognize(streaming_config, requests)
 
                 print_response(responses)
+                with open(f"output/{datetime.datetime.now():%Y-%m-%dT%H%M%S}.pcm", mode='bx') as f:
+                    for chunk in stream:
+                        f.write(chunk)
+
                 stream = []
             #f.write(base64.b64decode(d['data']['audio']))
             # try:
