@@ -44,6 +44,7 @@ def print_response(r):
             for alternative in alternatives:
                 print('Confidence: {}'.format(alternative.confidence))
                 print(u'Transcript: {}'.format(alternative.transcript))
+                return alternative.transcript
 
 
 async def ws_server(ws, path):
@@ -53,7 +54,6 @@ async def ws_server(ws, path):
     print(connected)
 
     stream = []
-    alternative = []
     transcript = 'Empty'
 
     while True:
@@ -81,22 +81,16 @@ async def ws_server(ws, path):
                 streaming_config = types.StreamingRecognitionConfig(config=config)
                 responses = client.streaming_recognize(streaming_config, requests)
 
-                for response in responses:
-                    for result in response.results:
-                        alternatives = result.alternatives
-                        for alternative in alternatives:
-                            print('Confidence: {}'.format(alternative.confidence))
-                            print(u'Transcript: {}'.format(alternative.transcript))
-                            transcript = alternative.transcript
+                res = print_response(responses)
 
 #                with open(f"output/{datetime.datetime.now():%Y-%m-%dT%H%M%S}.pcm", mode='bx') as f:
-                with open(f"output/{datetime.datetime.now():%Y-%m-%dT%H%M%S}_{transcript}.pcm", mode='bx') as f:
+                with open(f"output/{datetime.datetime.now():%Y-%m-%dT%H%M%S}_{res}.pcm", mode='bx') as f:
                     for chunk in stream:
                         f.write(chunk)
 
                 stream = []
 
-                out['data']['result'] = alternative.transcript
+                out['data']['result'] = res
 
     #            stop = time.time()
     #            out['data']['response_time'] = round(stop - start, 5)
