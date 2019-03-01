@@ -58,7 +58,7 @@ async def ws_server(ws, path):
         try:
             in_data = await ws.recv()
             d = json.loads(in_data)
-
+            transcript = 'Empty'
             if 'audio' in d['data']:
                 stream.append(base64.b64decode(d['data']['audio']))
             else:
