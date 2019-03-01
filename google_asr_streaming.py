@@ -42,6 +42,5 @@ def transcribe_streaming(stream_file):
                 print(u'Transcript: {}'.format(alternative.transcript))
 
 
-
 if __name__ == '__main__':
     transcribe_streaming('/Users/xiajimu/Documents/test/googleAsr/test.wav')

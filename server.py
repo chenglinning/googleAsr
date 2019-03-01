@@ -6,7 +6,6 @@ import asyncio
 import websockets
 import datetime
 import json
-import io
 import base64
 import time
 from google.cloud import speech
@@ -19,16 +18,18 @@ logging level
 asyncoronize
 """
 
-connected = set()
+USERS = set()
 
 
-def audio(ws):
+async def audio_pro(ws):
     while True:
-        in_data = ws.recv()
+        in_data = await ws.recv()
         d = json.loads(in_data)
         data = []
         if 'audio' in d['data']:
             data.append(base64.b64decode(d['data']['audio']))
+
+        yield b''.join(data)
 
 
 def print_response(r):
@@ -47,65 +48,80 @@ def print_response(r):
                 return alternative.transcript
 
 
+async def register(websocket):
+    USERS.add(websocket)
+    await asyncio.sleep(0)
+
+
+async def unregister(websocket):
+    USERS.remove(websocket)
+    await asyncio.sleep(0)
+
+
+def speech_api(stream):
+
+    client = speech.SpeechClient()
+
+    requests = (types.StreamingRecognizeRequest(audio_content=chunk)
+                for chunk in stream)
+
+    config = types.RecognitionConfig(
+        encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16,
+        sample_rate_hertz=16000,
+        language_code='en-US')
+
+    streaming_config = types.StreamingRecognitionConfig(
+        config=config,
+        interim_results=False,
+        single_utterance=False)
+
+    responses = client.streaming_recognize(streaming_config, requests)
+
+    return responses
+
+
 async def ws_server(ws, path):
 
-    connected.add(ws)
-    print('current: ')
-    print(connected)
-
+    await register(ws)
     stream = []
-
-    while True:
-        try:
-            in_data = await ws.recv()
-            d = json.loads(in_data)
-
+    try:
+        async for message in ws:
+            d = json.loads(message)
             if 'audio' in d['data']:
                 stream.append(base64.b64decode(d['data']['audio']))
             else:
-                pass
-                
+                print(message)
+
             if d['header'][6] == 0:
-                start = time.time()
                 out = d
-                client = speech.SpeechClient()
+                responses = speech_api(stream)
 
-                requests = (types.StreamingRecognizeRequest(audio_content=chunk)
-                            for chunk in stream)
-
-                config = types.RecognitionConfig(
-                    encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16,
-                    sample_rate_hertz=16000,
-                    language_code='en-US')
-
-                streaming_config = types.StreamingRecognitionConfig(config=config)
-                responses = client.streaming_recognize(streaming_config, requests)
-
+                start = time.time()
                 res = print_response(responses)
                 stop = time.time()
-#                with open(f"output/{datetime.datetime.now():%Y-%m-%dT%H%M%S}.pcm", mode='bx') as f:
+
                 with open(f"output/{datetime.datetime.now():%Y-%m-%dT%H%M%S}_{res}.pcm", mode='bx') as f:
                     for chunk in stream:
                         f.write(chunk)
 
                 stream = []
-
                 out['data']['result'] = res
 
-    #            stop = time.time()
                 out['data']['response_time'] = round(stop - start, 5)
                 del out['data']['audio']
                 print(json.dumps(out))
                 await ws.send(json.dumps(out))
 
-        except websockets.exceptions.ConnectionClosed:
-            '''
-            TODO: Logging.info
-            '''
-            print('{}: user disconnected'.format(int(time.time())))
-            connected.remove(ws)
-            print(connected)
-            break
+    except websockets.exceptions.ConnectionClosed:
+        '''
+        TODO: Logging.info
+        '''
+        print('user disconnected')
+        await unregister(ws)
+
+    finally:
+        await unregister(ws)
+
 
 start_server = websockets.serve(ws_server, 'localhost', 3456)
 print('Start listening:')
