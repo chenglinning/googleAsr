@@ -21,7 +21,7 @@ async def hello():
             'ws://localhost:3456') as websocket:
 
         start = time.time()
-        with open("data/test.wav", "rb") as speech:
+        with open("data/navigate to san francisco internation airport.wav", "rb") as speech:
             content = speech.read()
 
         n = 512
